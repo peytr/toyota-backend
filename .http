@@ -1,0 +1,15 @@
+###
+POST http://localhost:5000/api/users/register
+content-type: application/json
+
+{
+    "firstName": "Luke",
+    "lastName": "Colcott",
+    "employeeNumber": "T12345",
+    "email": "l.colcott@live.com",
+    "department": "Research and Design",
+    "password": "password123",
+    "password2": "password123",
+    "administrator": true,
+    "active": true
+}

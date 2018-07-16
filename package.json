@@ -1,0 +1,30 @@
+{
+  "name": "toyota-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "jest",
+    "watch": "jest --watch *.js",
+    "dev-start": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "author": "Team-2",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "helmet": "^3.12.1",
+    "jsonwebtoken": "^8.3.0",
+    "mongoose": "^5.2.3",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "validator": "^10.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.1.0",
+    "jest": "^23.4.1",
+    "nodemon": "^1.18.2"
+  }
+}
