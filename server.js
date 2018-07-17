@@ -3,6 +3,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const passport = require('passport')
 const helmet = require('helmet')
+const cors = require('cors')
 
 require('dotenv').config()
 
@@ -23,6 +24,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 app.use(passport.initialize())
 app.use(helmet())
+app.use(cors())
 
 // Database Connection
 mongoose.connect(mongoURI)
