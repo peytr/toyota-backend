@@ -1,12 +1,12 @@
 ###
-POST http://localhost:5000/api/users/register
+POST http://localhost:5050/api/users/register
 content-type: application/json
 
 {
-    "firstName": "Luke",
-    "lastName": "Colcott",
+    "firstName": "Buke",
+    "lastName": "Bolcott",
     "employeeNumber": "T12345",
-    "email": "l.colcott@live.com",
+    "email": "b.bolcott@live.com",
     "department": "Research and Design",
     "password": "password123",
     "password2": "password123",
