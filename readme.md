@@ -6,16 +6,33 @@ API Routes:
 1. GET /api/users/ 
 2. POST /api/users/login 
 3. POST /api/users/register
-4. GET /api/users/current
+4. GET /api/users/me
 5. GET /api/users/:id
-6. PATCH / PUT  /api/users/:id
+6. PATCH /api/users/:id
+7. PATCH /api/users/:id/password
+8. PATCH /api/users/password
+
+### AUTH ERRORS
+If user is not logged in to user-authed endpoint - 401
+```
+{'errors': {'Unauthorized': 'Access denied'}}
+```
+If user does not have admin access to admin-authed endpoint - 403
+```
+{'errors': {'Unauthorized': 'Access denied'}}
+```
+If user has invalid token - 400
+```
+{'errors': {'Bad Request': 'Invalid token'}}
+```
+
 
 ### 1. GET /api/users/
-Headers Required: `Authorization: Bearer Token`\
+Cookies Required: `access_token=token`\
 Permissions required: `Admin: true`\
-Response (if authorized): 
+Response (if admin & authorized): 
 - An array of user objects
-- Each user object has the following keyss:
+- Each user object has the following keys:
     - _id
     - firstName
     - lastName
@@ -67,13 +84,9 @@ Response (if authorized):
     }
 ]
 ```
-Response (if not authorized)
-```
-
-```
 
 ### 2. POST /api/users/login
-Headers Required: `None`\
+Cookies Required: `None`\
 Request:
 - Expecting a POST application/json request in the following format:
 ```
@@ -90,17 +103,20 @@ Response:
     "admin": true,
 }
 ```
-- If INACTIVE but sucessful login (right passwword, right employee number) 
+- If INACTIVE but sucessful login (right password, right employee number) 
 ```
 
 ```
 - If unsucessful login returns (wrong password or wrong employee number)
 ```
+{
+    errors: "Invalid Employee Number or Password"
+}
 ```
 
 
 ### 3. POST /api/users/register
-Headers Required: `Authorization: Bearer Token`\
+Cookies Required: `access_token=token`\
 Permissions required: `Admin: true`\
 Request:
 - Expecting a POST application/json request in the following format:
@@ -131,14 +147,17 @@ Response:
 ```
 - If errors in the form are present json of this format is returned
 ```
-```
-- If not authorized, json of this format is returned
-```
+{
+    "errors": {
+        "firstName": "First name must be between 2 and 30 characters",
+        "email": "A user with that email already exists",
+        "employeeNumber": "A user with that employee number already exists"
+    }
+}
 ```
 
-
-### 4. GET /api/users/current
-Headers Required: `Authorization: Bearer Token`\
+### 4. GET /api/users/me
+Cookies Required: `access_token=token`\
 Response: 
 - Object containing details of current user
 ```
@@ -153,14 +172,10 @@ Response:
     "active": true 
 }
 ```
-- Response if not authorized (if not logged in)
-```
-
-```
 
 ### 5. GET /api/users/:id
-URL parameters required: `:id`, where `:id` is the Toyota Employee Number\
-Headers Required: `Authorization: Bearer Token`\
+URL parameters required: `:id,` where `:id` is the mongoose `_id` of the user
+Cookies Required: `access_token=token`\
 Permissions required: `Admin: true`\
 Response: 
 - If authorized, an object containing details corresponding to employee number
@@ -176,31 +191,45 @@ Response:
     "active": true 
 } 
 ```
-- If id is nout found, this json is returned
+- If user with `:id` is not found, this json is returned , with status 404
 ```
+{
+    "errors": {
+        "user": "Unable to find user"
+    }
+}
 ```
-- If not authorized, this json is returned
+- If there are errors in form, json int he following format is returned, with status 400
 ```
+{
+    "errors": {
+    "firstName": "First name field is required",
+    "lastName": "Last name field is required",
+    "employeeNumber": "Please select a department",
+    "password": "Password must be at least 6 characters",
+    "email": "Email is invalid",
+    "password2": "Confirm Password field is required"
+    }
+}
 ```
 
-### 6. PATCH / PUT  /api/users/:id
-URL parameters required: `:id,` where `:id` is the Toyota Employee Number\
-Headers Required: `Authorization: Bearer Token`\
+### 6. PATCH /api/users/:id
+URL parameters required: `:id,` where `:id` is the mongoose `_id` of the user
+Cookies Required: `access_token=token`\
 Permissions required: `Admin: true`\
 Expected Request:
 - Expecting an object with the user details required to be updeated
 - Expecting a POST application/json request in the following format:
 ```
 {
-    "_id": "634545435",
-    "firstName": "Luke",
-    "lastName": "Colcott",
-    "employeeNumber": "T12345",
-    "email": "l.colcott@live.com",
+    "firstName": "zo",
+    "lastName": "zolcott",
+    "employeeNumber": "T12349",
+    "email": "b.bolcott@live.com",
     "department": "Research and Design",
-    "administrator": true,
-    "active": true 
-}  
+    "administrator": false,
+    "active": true
+}
 ```
 Response: 
 - If user is successfully updated, returns an object with the updated details in the following format:
@@ -216,9 +245,28 @@ Response:
     "active": true 
 }  
 ```
-- If there are errors in the update, this json is returned
+- If there are errors in the form, this json is returned with status 400
 ```
+{
+    "errors": {
+    "firstName": "First name field is required",
+    "lastName": "Last name field is required",
+    "employeeNumber": "Please select a department",
+    "password": "Password must be at least 6 characters",
+    "email": "Email is invalid",
+    "password2": "Confirm Password field is required"
+    }
+}
 ```
-- If not authorized, this json is returned
+- If user was unable to be updated, this json is returned with status 500
 ```
+{
+    "errors": {
+        "error": "E11000 duplicate key error index: toyota.users.$employeeNumber_1 dup key: { : \"T12346\" }"
+    }
+}
 ```
+
+### 7. PATCH /api/users/:id/password
+
+### 8. PATCH /api/users/password
