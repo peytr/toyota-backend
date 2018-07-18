@@ -9,6 +9,7 @@ const User = require('../../models/User')
 // Validations
 const validateRegisterInput = require('../../validation/register')
 const validateLoginInput = require('../../validation/login')
+const validateUpdateUserInput = require('../../validation/updateUser')
 
 const userAuth = require('../../middleware/userAuth')
 const adminAuth = require('../../middleware/adminAuth')
@@ -22,48 +23,52 @@ router.get('/', [userAuth, adminAuth], async (req, res) => {
     const users = await User.listAll()
     return res.status(200).json(users)
   } catch (err) {
-    return res.status(500).json({errors: 'Unable to find users'})
+    return res.status(500).json({errors: {'user': 'Unable to find users'}})
   }
 })
 
-// GET api/users/current - Retrieves id from JWT payload and returns information about the current user
-router.get('/current', userAuth, async (req, res) => {
-  const user = await User.findById(req.user._id).select('-password')
-  return res.status(200).json(user)
+// GET api/users/me - Retrieves id from JWT payload and returns information about the current user
+router.get('/me', userAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password')
+    return res.status(200).json(user)
+  } catch (err) {
+    return res.status(500).json({errors: {'user': 'Unable to find user'}})
+  }
 })
 
 // POST api/user/register receives json with user details
-// TODO: Consider bringing validations for uniqueness down to the model
 router.post('/register', [userAuth, adminAuth], async (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body)
-  if (!isValid) {
-    return res.status(400).json(errors)
+  try {
+    const existingEmail = await User.findOne({ email: req.body.email })
+    const existingEmployee = await User.findOne({ employeeNumber: req.body.employeeNumber })
+    if (existingEmail || existingEmployee || !isValid) {
+      if (existingEmail) { errors.email = 'A user with that email already exists' }
+      if (existingEmployee) { errors.employeeNumber = 'A user with that employee number already exists' }
+      return res.status(400).json({errors})
+    }
+    const newUser = new User({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      employeeNumber: req.body.employeeNumber,
+      email: req.body.email,
+      department: req.body.department,
+      password: req.body.password,
+      administrator: req.body.administrator,
+      active: req.body.active
+    })
+    const salt = await bcrypt.genSalt(12)
+    const hash = await bcrypt.hash(newUser.password, salt)
+    newUser.password = hash
+    const user = await newUser.save()
+    return res.status(200).json(user)
+  } catch (err) {
+    return res.status(500).json({errors: `Unable to create new user due to ${err.message}`})
   }
-  const existingUser = await User.findOne({ email: req.body.email })
-  if (existingUser) {
-    errors.email = 'A user with that email already exists'
-    return res.status(400).json(errors)
-  }
-  const newUser = new User({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    employeeNumber: req.body.employeeNumber,
-    email: req.body.email,
-    department: req.body.department,
-    password: req.body.password,
-    administrator: req.body.administrator,
-    active: req.body.active
-  })
-  const salt = await bcrypt.genSalt(12)
-  const hash = await bcrypt.hash(newUser.password, salt)
-  newUser.password = hash
-  const user = await newUser.save()
-  return res.status(200).json(user)
 })
 
-// POST api/users/login receives json with fields: employeeNumber, password
-// if valid returns JWT token upon login
-// if not valid returns 400 with error
+// POST api/users/login receives json and sets cookie if credentials are correct
 router.post('/login', async (req, res) => {
   const { errors, isValid } = validateLoginInput(req.body)
   if (!isValid) {
@@ -72,45 +77,52 @@ router.post('/login', async (req, res) => {
   const { password, employeeNumber } = req.body
   const user = await User.findOne({employeeNumber: employeeNumber})
   if (!user) {
-    return res.status(400).json(errors)
+    return res.status(200).json({errors: 'Invalid Employee Number or Password'})
   }
   const validPassword = await bcrypt.compare(password, user.password)
   if (!validPassword) {
     errors.password = 'Incorrect Employee Number or Password'
-    return res.status(400).json(errors)
+    return res.status(200).json({errors: 'Invalid Employee Number or Password'})
   }
   const token = user.generateAuthToken()
-  return res.cookie('access_token', token, {}).json({success: true})
+  return res.cookie('access_token', token, {}).json({success: true, administrator: user.administrator})
 })
 
 // GET api/users/:id
 router.get('/:id', [userAuth, adminAuth], async (req, res) => {
-  const user = await User.findById(req.params.id).select('-password')
-  return res.status(200).json(user)
+  try {
+    const user = await User.findById(req.params.id).select('-password')
+    return res.status(200).json(user)
+  } catch (err) {
+    return res.status(404).json({errors: {'user': 'Unable to find user'}})
+  }
 })
 
 //  PATCH / PUT  /api/users/:id
 router.patch('/:id', [userAuth, adminAuth], async (req, res) => {
-  const user = await User.findById(req.params.id)
-  if (!user) {
-    return res.status(400).json({errors: 'User Not Found'})
+  try {
+    const user = await User.findById(req.params.id).select('-password')
+    if (!user) {
+      return res.status(404).json({errors: {'user': 'Unable to find user'}})
+    }
+    const { errors, isValid } = validateUpdateUserInput(req.body)
+    if (!isValid) {
+      return res.status(400).json({errors})
+    }
+    user.set({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      employeeNumber: req.body.employeeNumber,
+      email: req.body.email,
+      department: req.body.department,
+      administrator: req.body.administrator,
+      active: req.body.active
+    })
+    await user.save()
+    return res.status(200).json(user)
+  } catch (err) {
+    return res.status(500).json({errors: {'error': err.message}})
   }
-  const { errors, isValid } = validateRegisterInput(req.body)
-  if (!isValid) {
-    return res.status(400).json(errors)
-  }
-  user.set({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    employeeNumber: req.body.employeeNumber,
-    email: req.body.email,
-    department: req.body.department,
-    password: req.body.password,
-    administrator: req.body.administrator,
-    active: req.body.active
-  })
-  await user.save()
-  return res.status(200).json(user)
 })
 
 module.exports = router

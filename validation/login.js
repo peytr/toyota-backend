@@ -11,10 +11,6 @@ module.exports = function validateLoginInput (data) {
     errors.employeeNumber = 'Employee number is required'
   }
 
-  if (!Validator.isLength(data.employeeNumber, { min: 6, max: 6 })) {
-    errors.password = 'Invalid employee number or password'
-  }
-
   if (Validator.isEmpty(data.password)) {
     errors.password = 'Password field is required'
   }
