@@ -3,13 +3,22 @@ POST http://localhost:5050/api/users/register
 content-type: application/json
 
 {
-    "firstName": "Buke",
-    "lastName": "Bolcott",
-    "employeeNumber": "T12345",
-    "email": "b.bolcott@live.com",
+    "firstName": "Cuke",
+    "lastName": "Colcott",
+    "employeeNumber": "T12346",
+    "email": "c.colcott@live.com",
     "department": "Research and Design",
     "password": "password123",
     "password2": "password123",
     "administrator": true,
     "active": true
+}
+
+###
+POST http://localhost:5000/api/users/login
+content-type: application/json
+
+{
+    "employeeNumber": "T12345",
+    "password": "password123"
 }
