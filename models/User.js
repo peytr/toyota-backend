@@ -16,7 +16,8 @@ const userSchema = new Schema({
   },
   employeeNumber: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   email: {
     type: String,
@@ -47,7 +48,6 @@ userSchema.statics.listAll = function () {
 userSchema.methods.generateAuthToken = function () {
   const payload = {
     _id: this._id,
-    employeeNumber: this.employeeNumber,
     administrator: this.administrator
   }
   return jwt.sign(payload, SECRET, { expiresIn: 3600 })
