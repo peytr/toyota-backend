@@ -1,30 +1,30 @@
 // Require node packages
 const express = require('express')
 const mongoose = require('mongoose')
-const passport = require('passport')
 const helmet = require('helmet')
+const cookieParser = require('cookie-parser')
 const cors = require('cors')
-
 require('dotenv').config()
 
-// Passport Config
-require('./passport.js')(passport)
-
-// Routes
+// Require in Routes
 const users = require('./routes/api/users')
 
+const error = require('./middleware/error')
 // Constants
 const PORT = process.env.PORT || 5000
 const mongoURI = process.env.mongoURI
-
+const FRONTENDURL = process.env.FRONTENDURL
 const app = express()
 
 // Middleware
 app.use(express.json())
+app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
-app.use(passport.initialize())
 app.use(helmet())
-app.use(cors())
+app.use(cors({
+  origin: FRONTENDURL,
+  credentials: true
+}))
 
 // Database Connection
 mongoose.connect(mongoURI)
@@ -36,6 +36,8 @@ mongoose.connect(mongoURI)
   })
 
 app.use('/api/users', users)
+
+app.use(error)
 
 app.listen(PORT, () => {
   console.log(`Listening on ${PORT}`)

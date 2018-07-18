@@ -11,9 +11,9 @@ API Routes:
 6. PATCH / PUT  /api/users/:id
 
 ### 1. GET /api/users/
-Headers Required: `Authorization: Bearer Token`\
+Cookies Required: `access_token=token`
 Permissions required: `Admin: true`\
-Response (if authorized): 
+Response (if admin & authorized): 
 - An array of user objects
 - Each user object has the following keyss:
     - _id

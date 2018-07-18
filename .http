@@ -13,3 +13,12 @@ content-type: application/json
     "administrator": true,
     "active": true
 }
+
+###
+POST http://localhost:5000/api/users/login
+content-type: application/json
+
+{
+    "employeeNumber": "T12345",
+    "password": "password123"
+}

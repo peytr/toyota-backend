@@ -1,4 +1,8 @@
 const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
+
+const SECRET = process.env.SECRET
+
 const Schema = mongoose.Schema
 
 const userSchema = new Schema({
@@ -38,6 +42,15 @@ const userSchema = new Schema({
 
 userSchema.statics.listAll = function () {
   return this.find().select('-password')
+}
+
+userSchema.methods.generateAuthToken = function () {
+  const payload = {
+    _id: this._id,
+    employeeNumber: this.employeeNumber,
+    administrator: this.administrator
+  }
+  return jwt.sign(payload, SECRET, { expiresIn: 3600 })
 }
 
 const User = mongoose.model('users', userSchema)
