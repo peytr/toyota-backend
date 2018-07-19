@@ -10,6 +10,8 @@ const User = require('../../models/User')
 const validateRegisterInput = require('../../validation/register')
 const validateLoginInput = require('../../validation/login')
 const validateUpdateUserInput = require('../../validation/updateUser')
+const updateOldPassword = require('../../validation/updateOldPassword')
+const updateUserPassword = require('../../validation/updateUserPassword')
 
 const userAuth = require('../../middleware/userAuth')
 const adminAuth = require('../../middleware/adminAuth')
@@ -34,6 +36,34 @@ router.get('/me', userAuth, async (req, res) => {
     return res.status(200).json(user)
   } catch (err) {
     return res.status(500).json({errors: {'user': 'Unable to find user'}})
+  }
+})
+
+//  PATCH /api/users/:id
+router.patch('/password', userAuth, adminAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+    if (!user) {
+      return res.status(404).json({errors: {'user': 'Unable to find user'}})
+    }
+    const { errors, isValid } = updateUserPassword(req.body)
+    if (!isValid) {
+      return res.status(400).json({errors})
+    }
+    const validPassword = await bcrypt.compare(req.body.oldPassword, user.password)
+    if (!validPassword) {
+      errors.password = 'Incorrect Employee Number or Password'
+      return res.status(400).json({errors: 'Invalid Employee Number or Password'})
+    }
+    const salt = await bcrypt.genSalt(12)
+    const hash = await bcrypt.hash(req.body.password, salt)
+    user.set({
+      password: hash
+    })
+    await user.save()
+    return res.status(200).json({success: true})
+  } catch (err) {
+    return res.status(500).json({errors: {'user': 'Unable to find update user password'}})
   }
 })
 
@@ -82,7 +112,7 @@ router.post('/login', async (req, res) => {
   const validPassword = await bcrypt.compare(password, user.password)
   if (!validPassword) {
     errors.password = 'Incorrect Employee Number or Password'
-    return res.status(200).json({errors: 'Invalid Employee Number or Password'})
+    return res.status(400).json({errors: 'Invalid Employee Number or Password'})
   }
   const token = user.generateAuthToken()
   return res.cookie('access_token', token, {}).json({success: true, administrator: user.administrator})
@@ -120,6 +150,29 @@ router.patch('/:id', [userAuth, adminAuth], async (req, res) => {
     })
     await user.save()
     return res.status(200).json(user)
+  } catch (err) {
+    return res.status(500).json({errors: {'error': err.message}})
+  }
+})
+
+//  PATCH / PUT  /api/users/:id
+router.patch('/:id/password', [userAuth, adminAuth], async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+    if (!user) {
+      return res.status(404).json({errors: {'user': 'Unable to find user'}})
+    }
+    const { errors, isValid } = updateUserPassword(req.body)
+    if (!isValid) {
+      return res.status(400).json({errors})
+    }
+    const salt = await bcrypt.genSalt(12)
+    const hash = await bcrypt.hash(req.body.password, salt)
+    user.set({
+      password: hash
+    })
+    await user.save()
+    return res.status(200).json({success: true})
   } catch (err) {
     return res.status(500).json({errors: {'error': err.message}})
   }

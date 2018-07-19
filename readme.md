@@ -214,12 +214,12 @@ Response:
 ```
 
 ### 6. PATCH /api/users/:id
-URL parameters required: `:id,` where `:id` is the mongoose `_id` of the user
+URL parameters required: `:id,` where `:id` is the mongoose `_id` of the user\
 Cookies Required: `access_token=token`\
 Permissions required: `Admin: true`\
 Expected Request:
 - Expecting an object with the user details required to be updeated
-- Expecting a POST application/json request in the following format:
+- Expecting a PATCH application/json request in the following format:
 ```
 {
     "firstName": "zo",
@@ -268,5 +268,23 @@ Response:
 ```
 
 ### 7. PATCH /api/users/:id/password
+URL parameters required: `:id,` where `:id` is the mongoose `_id` of the user\
+Cookies Required: `access_token=token`\
+Permissions required: `Admin: true`
+```
+{
+    "password1": "newpass789",
+    "password2": "newpass789",
+}
+```
 
 ### 8. PATCH /api/users/password
+Cookies Required: `access_token=token`
+- Expecting a PATCH application/json request in the following format:
+```
+{
+    "oldPassword": "password123",
+    "password1": "newpass789",
+    "password2": "newpass789",
+}
+```
