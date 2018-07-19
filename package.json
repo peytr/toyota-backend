@@ -9,6 +9,9 @@
     "dev-start": "nodemon server.js",
     "start": "node server.js"
   },
+  "engines": {
+    "node": "10.4.1"
+  },
   "author": "Team-2",
   "license": "MIT",
   "dependencies": {
