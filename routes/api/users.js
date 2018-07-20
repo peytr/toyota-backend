@@ -67,6 +67,10 @@ router.patch('/password', [userAuth, adminAuth], async (req, res) => {
   }
 })
 
+router.get('/logout', (req, res) => {
+  return res.clearCookie('access_token').send()
+})
+
 // POST api/user/register receives json with user details
 router.post('/register', [userAuth, adminAuth], async (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body)
@@ -115,7 +119,8 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({errors: 'Invalid Employee Number or Password'})
   }
   const token = user.generateAuthToken()
-  return res.cookie('access_token', token, {}).json({success: true, administrator: user.administrator})
+  res.cookie('access_token', token, {})
+  return res.json({success: true, administrator: user.administrator})
 })
 
 // GET api/users/:id
