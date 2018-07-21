@@ -1,7 +1,7 @@
 const Validator = require('validator')
 const isEmpty = require('./is-empty')
 
-module.exports = function validateRegisterInput (data) {
+module.exports = function validateOwnPasswordInput (data) {
   let errors = {}
   data.password = !isEmpty(data.password) ? data.password : ''
   data.password2 = !isEmpty(data.password2) ? data.password2 : ''
@@ -11,6 +11,7 @@ module.exports = function validateRegisterInput (data) {
   }
 
   if (!Validator.isLength(data.password, { min: 6, max: 30 })) {
+    console.log(data.password)
     errors.password = 'Password must be at least 6 characters'
   }
 
