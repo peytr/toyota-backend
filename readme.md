@@ -288,3 +288,31 @@ Cookies Required: `access_token=token`
     "password2": "newpass789",
 }
 ```
+
+## SOPS
+------
+1. GET /api/sops/ - Get All SOPS
+2. POST /api/sops
+3. GET /api/sops/:id
+4. PATCH /api/sops/:id
+5. DELETE /api/sops/:id
+
+### GET /api/sops
+```
+```
+
+### POST /api/sops
+```
+```
+
+### GET /api/sops
+```
+```
+
+### PATCH /api/sops
+```
+```
+
+### DELETE /api/sops
+```
+```

@@ -46,7 +46,7 @@ router.patch('/password', userAuth, adminAuth, async (req, res) => {
     if (!user) {
       return res.status(404).json({errors: {'user': 'Unable to find user'}})
     }
-    const { errors, isValid } = updateUserPassword(req.body)
+    const { errors, isValid } = updateOldPassword(req.body)
     if (!isValid) {
       return res.status(400).json({errors})
     }
