@@ -9,6 +9,7 @@ require('dotenv').config()
 
 // Require in Routes
 const users = require('./routes/api/users')
+const sops = require('./routes/api/sops')
 
 const error = require('./middleware/error')
 // Constants
@@ -39,6 +40,8 @@ mongoose.connect(mongoURI)
   })
 
 app.use('/api/users', users)
+
+app.use('/api/sops', sops)
 
 app.get('/api/auth', (req, res) => {
   const token = req.cookies.access_token
