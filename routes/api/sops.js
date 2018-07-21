@@ -12,13 +12,23 @@ const Sop = require('../../models/Sop')
 const userAuth = require('../../middleware/userAuth')
 const adminAuth = require('../../middleware/adminAuth')
 
+// constants
+const AWS_KEY = process.env.AWS_KEY
+const AWS_ID = process.env.AWS_ID
+const AWS_BUCKET = process.env.AWS_BUCKET
+
 // S3 / Multer configuration
+aws.config.update({
+  secretAccessKey: AWS_KEY,
+  accessKeyId: AWS_ID
+})
+
 const s3 = new aws.S3()
 
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'multer-test',
+    bucket: AWS_BUCKET,
     contentDisposition: 'inline',
     metadata: function (req, file, cb) {
       cb(null, Object.assign({}, req.body))
@@ -129,12 +139,34 @@ router.patch('/addversion/:id', [userAuth, adminAuth], async (req, res) => {
 })
 
 router.get('/download/:key', function (req, res, next) {
-  const options = {
-    Bucket: 'multer-test',
+  const params = {
+    Bucket: AWS_BUCKET,
     Key: req.params.key
   }
-  var fileStream = s3.getObject(options).createReadStream()
-  fileStream.pipe(res)
+  s3.headObject(params, function (err, data) {
+    if (err) {
+      return next(err)
+    }
+    var stream = s3.getObject(params).createReadStream()
+    stream.on('error', (err) => {
+      return next(err)
+    })
+    console.log(data)
+    res.set('Content-Type', data.ContentType)
+    res.set('Content-Length', data.ContentLength)
+    res.set('Last-Modified', data.LastModified)
+    res.set('ETag', data.ETag)
+    stream.pipe(res)
+  })
+})
+
+router.get('/:id', [userAuth, adminAuth], async (req, res) => {
+  try {
+    const sop = await Sop.findById(req.params.id)
+    return res.status(200).json(sop)
+  } catch (err) {
+    return res.status(500).json({errors: {'sop': 'Unable to find sop'}})
+  }
 })
 
 module.exports = router

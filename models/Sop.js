@@ -51,6 +51,8 @@ const sopSchema = new mongoose.Schema({
   previousVersions: [versionSchema]
 })
 
+versionSchema.virtual('expiresAt').get(function () { return this.createdAt + ' ' + this.name.last })
+
 const Sop = mongoose.model('Sop', sopSchema)
 
 module.exports = Sop
