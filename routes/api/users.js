@@ -55,11 +55,7 @@ router.patch('/password', userAuth, adminAuth, async (req, res) => {
       errors.password = 'Incorrect Employee Number or Password'
       return res.status(400).json({errors: 'Invalid Employee Number or Password'})
     }
-    const salt = await bcrypt.genSalt(12)
-    const hash = await bcrypt.hash(req.body.password, salt)
-    user.set({
-      password: hash
-    })
+    user.set({password: req.body.password})
     await user.save()
     return res.status(200).json({success: true})
   } catch (err) {
@@ -92,9 +88,6 @@ router.post('/register', [userAuth, adminAuth], async (req, res) => {
       administrator: req.body.administrator,
       active: req.body.active
     })
-    const salt = await bcrypt.genSalt(12)
-    const hash = await bcrypt.hash(newUser.password, salt)
-    newUser.password = hash
     const user = await newUser.save()
     return res.status(200).json(user)
   } catch (err) {
@@ -171,10 +164,8 @@ router.patch('/:id/password', [userAuth, adminAuth], async (req, res) => {
     if (!isValid) {
       return res.status(400).json({errors})
     }
-    const salt = await bcrypt.genSalt(12)
-    const hash = await bcrypt.hash(req.body.password, salt)
     user.set({
-      password: hash
+      password: req.body.password
     })
     await user.save()
     return res.status(200).json({success: true})
