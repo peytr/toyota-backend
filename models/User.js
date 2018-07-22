@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 
 const SECRET = process.env.SECRET
 
@@ -39,6 +40,19 @@ const userSchema = new Schema({
     type: Boolean,
     default: true
   }
+})
+
+userSchema.pre('save', function (next) {
+  const user = this
+  if (!user.isModified('password')) return next()
+  bcrypt.genSalt(12, function (err, salt) {
+    if (err) return next(err)
+    bcrypt.hash(user.password, salt, function (err, hash) {
+      if (err) return next(err)
+      user.password = hash
+      return next()
+    })
+  })
 })
 
 userSchema.statics.listAll = function () {
