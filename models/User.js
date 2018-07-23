@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 
 const SECRET = process.env.SECRET
 
@@ -41,6 +42,19 @@ const userSchema = new Schema({
   }
 })
 
+userSchema.pre('save', function (next) {
+  const user = this
+  if (!user.isModified('password')) return next()
+  bcrypt.genSalt(12, function (err, salt) {
+    if (err) return next(err)
+    bcrypt.hash(user.password, salt, function (err, hash) {
+      if (err) return next(err)
+      user.password = hash
+      return next()
+    })
+  })
+})
+
 userSchema.statics.listAll = function () {
   return this.find().select('-password')
 }
@@ -52,6 +66,12 @@ userSchema.methods.generateAuthToken = function () {
   }
   return jwt.sign(payload, SECRET, { expiresIn: 3600 })
 }
+
+userSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`
+})
+
+userSchema.set('toObject', { getters: true })
 
 const User = mongoose.model('users', userSchema)
 
