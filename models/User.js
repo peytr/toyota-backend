@@ -67,6 +67,12 @@ userSchema.methods.generateAuthToken = function () {
   return jwt.sign(payload, SECRET, { expiresIn: 3600 })
 }
 
+userSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`
+})
+
+userSchema.set('toObject', { getters: true })
+
 const User = mongoose.model('users', userSchema)
 
 module.exports = User
