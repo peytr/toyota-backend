@@ -81,11 +81,11 @@ router.get('/mysop', userAuth, async (req, res) => {
   const unreadSops = await Sop.find({
     'currentVersion.usersRequired': req.user._id,
     'currentVersion.usersRead': { $ne: req.user._id },
-    'oldVersions.usersRead': { $ne: req.user._id }}).select('title currentVersion.version currentVersion.awsPath')
+    'previousVersions.usersRead': { $ne: req.user._id }}).select('title currentVersion.version currentVersion.awsPath')
   const outdatedSops = await Sop.find({
     'currentVersion.usersRequired': req.user._id,
     'currentVersion.usersRead': { $ne: req.user._id },
-    'oldVersions.usersRead': req.user._id }).select('title currentVersion.version currentVersion.awsPath')
+    'previousVersions.usersRead': req.user._id }).select('title currentVersion.version currentVersion.awsPath')
   const summarySop = {
     readSops,
     unreadSops,
@@ -135,14 +135,20 @@ router.patch('/removeuser/:id', [userAuth, adminAuth], async (req, res) => {
 })
 
 // PATCH /addversion/:id
-router.patch('/addversion/:id', [userAuth, adminAuth], async (req, res) => {
-  const ver = req.body.ver
+router.post('/addversion/:id', [userAuth, adminAuth, upload.any()], async (req, res) => {
   try {
+    const newVersion = {
+      author: req.body.author,
+      createdAt: req.body.createdAt,
+      awsPath: req.files[0].key
+    }
     const sop = await Sop.findById(req.params.id)
-    sop.oldVersions.push(sop.currentVersion)
-    sop.currentVersion = Object.assign(ver, { usersRequired: sop.currentVersion.usersRequired })
+    sop.previousVersions.push(sop.currentVersion)
+    newVersion.version = sop.currentVersion.version + 1
+    sop.currentVersion = Object.assign(newVersion, { usersRequired: sop.currentVersion.usersRequired })
     await sop.save()
   } catch (err) {
+    console.log(err.message)
     return res.status(500)({errors: {'sops': `Unable to add update SOP due to ${err.message}`}})
   }
 })
