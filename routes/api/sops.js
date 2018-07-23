@@ -147,11 +147,9 @@ router.post('/addversion/:id', [userAuth, adminAuth, upload.any()], async (req, 
     newVersion.version = sop.currentVersion.version + 1
     sop.currentVersion = Object.assign(newVersion, { usersRequired: sop.currentVersion.usersRequired })
     await sop.save()
-    console.log(sop)
-    console.log(sop.currentVersion)
-    return res.status(200).json({success: true, sop, currentVersion: sop.currentVersion})
+    const users = await User.find().select('firstName lastName fullName department')
+    return res.status(200).json({success: true, sop, users})
   } catch (err) {
-    console.log(err.message)
     return res.status(500).json({errors: {'sops': `Unable to add update SOP due to ${err.message}`}})
   }
 })
