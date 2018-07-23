@@ -187,9 +187,7 @@ router.get('/:id', [userAuth, adminAuth], async (req, res) => {
     const unreadUserIds = Array.from(unreadIds)
     const usersUnread = await User.find({_id: { $in: unreadUserIds }}).select('firstName lastName fullName department')
     const usersSelectable = await User.find({_id: {$nin: sop.currentVersion.usersRequired}}).select('firstName lastName fullName department')
-    const pieData = sop.currentVersion.pieData
-    const summaryStats = sop.currentVersion.summaryStats
-    return res.status(200).json({sop, usersUnread, usersSelectable, pieData, summaryStats})
+    return res.status(200).json({sop, usersUnread, usersSelectable})
   } catch (err) {
     return res.status(500).json({errors: {'sop': 'Unable to find sop'}})
   }
