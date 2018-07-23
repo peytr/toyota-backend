@@ -292,7 +292,8 @@ Cookies Required: `access_token=token`
 ## SOPS
 ------
 1. GET /api/sops/ - Get All SOPS
-2. POST /api/sops
+1. GET /api/sops/mysops - Get logged in users SOPs
+2. POST /api/sops/
 3. GET /api/sops/:id
 4. PATCH /api/sops/:id
 5. DELETE /api/sops/:id
@@ -301,6 +302,32 @@ Cookies Required: `access_token=token`
 ```
 ```
 
+### GET /api/mysops
+```
+{
+    "readSops": [
+        {
+            "_id": "5b52645d34006c0b8115a4b3",
+            "title": "Barrr",
+            "currentVersion": {
+                "version": 1,
+                "awsPath": "1532126300565-1532125030444-atlassian-git-cheatsheet.pdf"
+            }
+        }
+    ],
+    "unreadSops": [
+        {
+            "_id": "5b52809c7474d61043a11569",
+            "title": "Lift Trucks",
+            "currentVersion": {
+                "version": 3,
+                "awsPath": "1532133531640-1532125030444-atlassian-git-cheatsheet.pdf"
+            }
+        }
+    ],
+    "outdatedSops": []
+}
+```
 ### POST /api/sops
 ```
 ```

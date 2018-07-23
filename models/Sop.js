@@ -51,7 +51,30 @@ const sopSchema = new mongoose.Schema({
   previousVersions: [versionSchema]
 })
 
-versionSchema.virtual('expiresAt').get(function () { return this.createdAt + ' ' + this.name.last })
+versionSchema.virtual('pieData').get(function () {
+  const read = this.usersRead.length
+  const unread = this.usersRequired.length - this.usersRead.length
+  return [
+    {title: 'Read', value: read, color: 'green'},
+    {title: 'Unread', value: unread, color: 'red'}]
+})
+
+versionSchema.virtual('summaryStats').get(function () {
+  const read = this.usersRead.length
+  const readPercent = Math.round(100 * this.usersRead.length / this.usersRequired.length)
+  const unread = this.usersRequired.length - this.usersRead.length
+  const unreadPercent = Math.round(100 * (this.usersRequired.length - this.usersRead.length) / this.usersRequired.length)
+  const total = this.usersRequired.length
+  return {
+    read,
+    readPercent,
+    unread,
+    unreadPercent,
+    total
+  }
+})
+
+// versionSchema.set('toObject', { virtuals: true })
 
 const Sop = mongoose.model('Sop', sopSchema)
 
