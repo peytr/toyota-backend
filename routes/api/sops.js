@@ -104,6 +104,8 @@ router.get('/allforuser', userAuth, async (req, res) => {
           'version': '$currentVersion.version',
           'awsPath': '$currentVersion.awsPath',
           'department': '$department',
+          'author': '$currentVersion.author',
+          'createdAt': '$currentVersion.createdAt',
           'read': {
             $in: [ req.user._id, '$currentVersion.usersRead' ]
           }
