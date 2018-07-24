@@ -94,6 +94,28 @@ router.get('/mysop', userAuth, async (req, res) => {
   return res.status(200).json(summarySop)
 })
 
+// GET api/sops/ -
+router.get('/allforuser', userAuth, async (req, res) => {
+  try {
+    const sops = await Sop.aggregate([
+      {
+        $project: {
+          'title': '$title',
+          'version': '$currentVersion.version',
+          'awsPath': '$currentVersion.awsPath',
+          'department': '$department',
+          'read': {
+            $in: [ req.user._id, '$currentVersion.usersRead' ]
+          }
+        }
+      }
+    ])
+    return res.status(200).json(sops)
+  } catch (err) {
+    return res.status(500).json({errors: {sops: 'Unable to retrieve SOPS'}})
+  }
+})
+
 // GET api/sops/markasread/:id - Current logged in user marks sop :id as read
 router.patch('/markasread/:id', userAuth, async (req, res) => {
   await Sop.findByIdAndUpdate(
