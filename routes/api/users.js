@@ -5,6 +5,7 @@ require('dotenv').config()
 
 // Models
 const User = require('../../models/User')
+const Sop = require('../../models/Sop')
 
 // Validations
 const validateRegisterInput = require('../../validation/register')
@@ -119,8 +120,25 @@ router.post('/login', async (req, res) => {
 // GET api/users/:id
 router.get('/:id', [userAuth, adminAuth], async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password')
-    return res.status(200).json(user)
+    const userId = req.params.id
+    console.log(userId)
+    const user = await User.findById(userId).select('-password')
+    const readSops = await Sop.find({ 'currentVersion.usersRead': userId }).select('title currentVersion.version currentVersion.awsPath')
+    const unreadSops = await Sop.find({
+      'currentVersion.usersRequired': userId,
+      'currentVersion.usersRead': { $ne: userId },
+      'oldVersions.usersRead': { $ne: userId }}).select('title currentVersion.version currentVersion.awsPath')
+    const outdatedSops = await Sop.find({
+      'currentVersion.usersRequired': userId,
+      'currentVersion.usersRead': { $ne: userId },
+      'oldVersions.usersRead': userId }).select('title currentVersion.version currentVersion.awsPath')
+    const summarySop = {
+      readSops,
+      unreadSops,
+      outdatedSops
+    }
+    console.log(summarySop)
+    return res.status(200).json({user, summarySop})
   } catch (err) {
     return res.status(404).json({errors: {'user': 'Unable to find user'}})
   }
