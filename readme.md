@@ -181,15 +181,34 @@ Response:
 - If authorized, an object containing details corresponding to employee number
 ```
 {
-    "_id": "634545435",
-    "firstName": "Luke",
-    "lastName": "Colcott",
-    "employeeNumber": "T12345",
-    "email": "l.colcott@live.com",
-    "department": "Research and Design",
-    "administrator": true,
-    "active": true 
-} 
+    "user": {
+        "active": true,
+        "_id": "5b5410d47d093a520a2edbfa",
+        "firstName": "Allen",
+        "lastName": "Watts",
+        "employeeNumber": "T10004",
+        "email": "a.watts@toyota.com.au",
+        "department": "Regulations, Conversions & Accessories",
+        "administrator": false,
+        "__v": 0,
+        "fullName": "Allen Watts",
+        "id": "5b5410d47d093a520a2edbfa"
+    },
+    "summarySop": {
+        "readSops": [],
+        "unreadSops": [
+            {
+                "_id": "5b52645d34006c0b8115a4b3",
+                "title": "Barrr",
+                "currentVersion": {
+                    "version": 1,
+                    "awsPath": "1532126300565-1532125030444-atlassian-git-cheatsheet.pdf"
+                }
+            }
+        ],
+        "outdatedSops": []
+    }
+}
 ```
 - If user with `:id` is not found, this json is returned , with status 404
 ```
@@ -287,4 +306,59 @@ Cookies Required: `access_token=token`
     "password1": "newpass789",
     "password2": "newpass789",
 }
+```
+
+## SOPS
+------
+1. GET /api/sops/ - Get All SOPS
+1. GET /api/sops/mysops - Get logged in users SOPs
+2. POST /api/sops/
+3. GET /api/sops/:id
+4. PATCH /api/sops/:id
+5. DELETE /api/sops/:id
+
+### GET /api/sops
+```
+```
+
+### GET /api/mysops
+```
+{
+    "readSops": [
+        {
+            "_id": "5b52645d34006c0b8115a4b3",
+            "title": "Barrr",
+            "currentVersion": {
+                "version": 1,
+                "awsPath": "1532126300565-1532125030444-atlassian-git-cheatsheet.pdf"
+            }
+        }
+    ],
+    "unreadSops": [
+        {
+            "_id": "5b52809c7474d61043a11569",
+            "title": "Lift Trucks",
+            "currentVersion": {
+                "version": 3,
+                "awsPath": "1532133531640-1532125030444-atlassian-git-cheatsheet.pdf"
+            }
+        }
+    ],
+    "outdatedSops": []
+}
+```
+### POST /api/sops
+```
+```
+
+### GET /api/sops
+```
+```
+
+### PATCH /api/sops
+```
+```
+
+### DELETE /api/sops
+```
 ```

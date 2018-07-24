@@ -5,6 +5,7 @@ require('dotenv').config()
 
 // Models
 const User = require('../../models/User')
+const Sop = require('../../models/Sop')
 
 // Validations
 const validateRegisterInput = require('../../validation/register')
@@ -40,13 +41,13 @@ router.get('/me', userAuth, async (req, res) => {
 })
 
 //  PATCH /api/users/:id
-router.patch('/password', userAuth, adminAuth, async (req, res) => {
+router.patch('/password', [userAuth, adminAuth], async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
     if (!user) {
       return res.status(404).json({errors: {'user': 'Unable to find user'}})
     }
-    const { errors, isValid } = updateUserPassword(req.body)
+    const { errors, isValid } = updateOldPassword(req.body)
     if (!isValid) {
       return res.status(400).json({errors})
     }
@@ -55,11 +56,7 @@ router.patch('/password', userAuth, adminAuth, async (req, res) => {
       errors.password = 'Incorrect Employee Number or Password'
       return res.status(400).json({errors: 'Invalid Employee Number or Password'})
     }
-    const salt = await bcrypt.genSalt(12)
-    const hash = await bcrypt.hash(req.body.password, salt)
-    user.set({
-      password: hash
-    })
+    user.set({password: req.body.password})
     await user.save()
     return res.status(200).json({success: true})
   } catch (err) {
@@ -92,9 +89,6 @@ router.post('/register', [userAuth, adminAuth], async (req, res) => {
       administrator: req.body.administrator,
       active: req.body.active
     })
-    const salt = await bcrypt.genSalt(12)
-    const hash = await bcrypt.hash(newUser.password, salt)
-    newUser.password = hash
     const user = await newUser.save()
     return res.status(200).json(user)
   } catch (err) {
@@ -126,8 +120,23 @@ router.post('/login', async (req, res) => {
 // GET api/users/:id
 router.get('/:id', [userAuth, adminAuth], async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password')
-    return res.status(200).json(user)
+    const userId = req.params.id
+    const user = await User.findById(userId).select('-password')
+    const readSops = await Sop.find({ 'currentVersion.usersRead': userId }).select('title currentVersion.version currentVersion.awsPath')
+    const unreadSops = await Sop.find({
+      'currentVersion.usersRequired': userId,
+      'currentVersion.usersRead': { $ne: userId },
+      'previousVersions.usersRead': { $ne: userId }}).select('title currentVersion.version currentVersion.awsPath')
+    const outdatedSops = await Sop.find({
+      'currentVersion.usersRequired': userId,
+      'currentVersion.usersRead': { $ne: userId },
+      'previousVersions.usersRead': userId }).select('title currentVersion.version currentVersion.awsPath')
+    const summarySop = {
+      readSops,
+      unreadSops,
+      outdatedSops
+    }
+    return res.status(200).json({user, summarySop})
   } catch (err) {
     return res.status(404).json({errors: {'user': 'Unable to find user'}})
   }
@@ -142,7 +151,7 @@ router.patch('/:id', [userAuth, adminAuth], async (req, res) => {
     }
     const { errors, isValid } = validateUpdateUserInput(req.body)
     if (!isValid) {
-      return res.status(400).json({errors})
+      return res.status(200).json({errors})
     }
     user.set({
       firstName: req.body.firstName,
@@ -171,10 +180,8 @@ router.patch('/:id/password', [userAuth, adminAuth], async (req, res) => {
     if (!isValid) {
       return res.status(400).json({errors})
     }
-    const salt = await bcrypt.genSalt(12)
-    const hash = await bcrypt.hash(req.body.password, salt)
     user.set({
-      password: hash
+      password: req.body.password
     })
     await user.save()
     return res.status(200).json({success: true})
