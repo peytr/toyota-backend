@@ -1,8 +1,9 @@
 // Require Node Packages
 const express = require('express')
-var multer = require('multer')
-var multerS3 = require('multer-s3')
-var aws = require('aws-sdk')
+const multer = require('multer')
+const multerS3 = require('multer-s3')
+const aws = require('aws-sdk')
+const mongoose = require('mongoose')
 
 require('dotenv').config()
 
@@ -107,7 +108,7 @@ router.get('/allforuser', userAuth, async (req, res) => {
           'author': '$currentVersion.author',
           'createdAt': '$currentVersion.createdAt',
           'read': {
-            $in: [ req.user._id, '$currentVersion.usersRead' ]
+            $in: [ mongoose.Types.ObjectId(req.user._id), '$currentVersion.usersRead' ]
           }
         }
       }
