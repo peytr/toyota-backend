@@ -81,17 +81,39 @@ router.get('/mysop', userAuth, async (req, res) => {
   const unreadSops = await Sop.find({
     'currentVersion.usersRequired': req.user._id,
     'currentVersion.usersRead': { $ne: req.user._id },
-    'oldVersions.usersRead': { $ne: req.user._id }}).select('title currentVersion.version currentVersion.awsPath')
+    'previousVersions.usersRead': { $ne: req.user._id }}).select('title currentVersion.version currentVersion.awsPath')
   const outdatedSops = await Sop.find({
     'currentVersion.usersRequired': req.user._id,
     'currentVersion.usersRead': { $ne: req.user._id },
-    'oldVersions.usersRead': req.user._id }).select('title currentVersion.version currentVersion.awsPath')
+    'previousVersions.usersRead': req.user._id }).select('title currentVersion.version currentVersion.awsPath')
   const summarySop = {
     readSops,
     unreadSops,
     outdatedSops
   }
   return res.status(200).json(summarySop)
+})
+
+// GET api/sops/ -
+router.get('/allforuser', userAuth, async (req, res) => {
+  try {
+    const sops = await Sop.aggregate([
+      {
+        $project: {
+          'title': '$title',
+          'version': '$currentVersion.version',
+          'awsPath': '$currentVersion.awsPath',
+          'department': '$department',
+          'read': {
+            $in: [ req.user._id, '$currentVersion.usersRead' ]
+          }
+        }
+      }
+    ])
+    return res.status(200).json(sops)
+  } catch (err) {
+    return res.status(500).json({errors: {sops: 'Unable to retrieve SOPS'}})
+  }
 })
 
 // GET api/sops/markasread/:id - Current logged in user marks sop :id as read
@@ -135,15 +157,22 @@ router.patch('/removeuser/:id', [userAuth, adminAuth], async (req, res) => {
 })
 
 // PATCH /addversion/:id
-router.patch('/addversion/:id', [userAuth, adminAuth], async (req, res) => {
-  const ver = req.body.ver
+router.post('/addversion/:id', [userAuth, adminAuth, upload.any()], async (req, res) => {
   try {
+    const newVersion = {
+      author: req.body.author,
+      createdAt: req.body.createdAt,
+      awsPath: req.files[0].key
+    }
     const sop = await Sop.findById(req.params.id)
-    sop.oldVersions.push(sop.currentVersion)
-    sop.currentVersion = Object.assign(ver, { usersRequired: sop.currentVersion.usersRequired })
+    sop.previousVersions.push(sop.currentVersion)
+    newVersion.version = sop.currentVersion.version + 1
+    sop.currentVersion = Object.assign(newVersion, { usersRequired: sop.currentVersion.usersRequired })
     await sop.save()
+    const users = await User.find().select('firstName lastName fullName department')
+    return res.status(200).json({success: true, sop, users})
   } catch (err) {
-    return res.status(500)({errors: {'sops': `Unable to add update SOP due to ${err.message}`}})
+    return res.status(500).json({errors: {'sops': `Unable to add update SOP due to ${err.message}`}})
   }
 })
 
@@ -180,9 +209,7 @@ router.get('/:id', [userAuth, adminAuth], async (req, res) => {
     const unreadUserIds = Array.from(unreadIds)
     const usersUnread = await User.find({_id: { $in: unreadUserIds }}).select('firstName lastName fullName department')
     const usersSelectable = await User.find({_id: {$nin: sop.currentVersion.usersRequired}}).select('firstName lastName fullName department')
-    const pieData = sop.currentVersion.pieData
-    const summaryStats = sop.currentVersion.summaryStats
-    return res.status(200).json({sop, usersUnread, usersSelectable, pieData, summaryStats})
+    return res.status(200).json({sop, usersUnread, usersSelectable})
   } catch (err) {
     return res.status(500).json({errors: {'sop': 'Unable to find sop'}})
   }
