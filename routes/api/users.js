@@ -65,7 +65,6 @@ router.patch('/password', userAuth, adminAuth, async (req, res) => {
 })
 
 router.get('/logout', (req, res) => {
-  res.cookies.set('access_token', {expires: Date.now()})
   return res.clearCookie('access_token', {path: '/'}).send()
 })
 
