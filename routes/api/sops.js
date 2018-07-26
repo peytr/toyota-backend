@@ -180,7 +180,7 @@ router.post('/addversion/:id', [userAuth, adminAuth, upload.any()], async (req, 
 })
 
 // GET /download/:key Streams PDF file from AWS bucket corresponding to :key
-router.get('/download/:key', function (req, res, next) {
+router.get('/download/:key', userAuth, function (req, res, next) {
   const params = {
     Bucket: AWS_BUCKET,
     Key: req.params.key

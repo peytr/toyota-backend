@@ -65,7 +65,8 @@ router.patch('/password', userAuth, adminAuth, async (req, res) => {
 })
 
 router.get('/logout', (req, res) => {
-  return res.clearCookie('access_token', {path: '/'}).send()
+  res.cookie('access_token', { expires: new Date(1), path: '/' })
+  return res.status(200).send()
 })
 
 // POST api/user/register receives json with user details
