@@ -51,7 +51,7 @@ app.get('/api/auth', (req, res) => {
   }
 })
 
-app.use('/portal', express.static(path.join(__dirname, 'build')))
+app.use('/build', express.static(path.join(__dirname, 'build')))
 
 app.use(error)
 
