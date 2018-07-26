@@ -3,7 +3,6 @@ const express = require('express')
 const mongoose = require('mongoose')
 const helmet = require('helmet')
 const cookieParser = require('cookie-parser')
-const cors = require('cors')
 const jwt = require('jsonwebtoken')
 const path = require('path')
 require('dotenv').config()
@@ -16,7 +15,6 @@ const error = require('./middleware/error')
 // Constants
 const PORT = process.env.PORT || 5000
 const mongoURI = process.env.mongoURI
-const FRONTENDURL = process.env.FRONTENDURL
 const SECRET = process.env.SECRET
 
 const app = express()
@@ -26,10 +24,6 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
 app.use(helmet())
-app.use(cors({
-  origin: FRONTENDURL,
-  credentials: true
-}))
 app.use(express.static('build'))
 
 // Database Connection
