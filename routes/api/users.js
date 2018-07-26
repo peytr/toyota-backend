@@ -114,7 +114,7 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({errors: 'Invalid Employee Number or Password'})
   }
   const token = user.generateAuthToken()
-  res.cookie('access_token', token, {maxAge: Date.now()})
+  res.cookie('access_token', token, {maxAge: Date.now(), path: '/'})
   return res.json({success: true, administrator: user.administrator})
 })
 
