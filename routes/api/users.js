@@ -14,10 +14,10 @@ const validateUpdateUserInput = require('../../validation/updateUser')
 const updateOldPassword = require('../../validation/updateOldPassword')
 const updateUserPassword = require('../../validation/updateUserPassword')
 
+// Auth Middleware
 const userAuth = require('../../middleware/userAuth')
 const adminAuth = require('../../middleware/adminAuth')
 
-// Constants
 const router = express.Router()
 
 // GET api/users - Returns all users from the User Collection

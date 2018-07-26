@@ -314,12 +314,17 @@ Cookies Required: `access_token=token`
 1. GET /api/sops/mysops - Get logged in users SOPs
 2. POST /api/sops/
 3. GET /api/sops/:id
-4. PATCH /api/sops/:id
-5. DELETE /api/sops/:id
+5. PATCH /api/sops/addusers/:id
+6. PATCH /api/sops/removeuser/:id
+7. GET /api/sops/:id
+8. POST /api/sops/addversion/:id
+9. PATCH api/sops/markasread/:id
+10. GET /apisops/download/:key
 
 ### GET /api/sops
-Cookies Required: `access_token=token`
-Permissions required: `Admin: true`
+Cookies Required: `access_token=token`\
+Permissions required: `Admin: true`\
+Sends all SOPs from the database to an ADMIN user in this format
 ```
 [
     {
@@ -890,7 +895,7 @@ If database query fails returns status 500
 {errors: {'sops': 'Unable to find sops'}}
 ```
 
-### GET /api/mysops
+### GET /api/sops/mysops
 ```
 {
     "readSops": [
@@ -916,18 +921,192 @@ If database query fails returns status 500
     "outdatedSops": []
 }
 ```
+
 ### POST /api/sops
+Recieves a FormData from admin user with version, author, createdAt, file
+Cookies Required: `access_token=token`\
+Permissions required: `Admin: true`\
+On successful creation, JSON object with SOP details return
+```
+{
+    "sop": {
+        "_id": "5b56a7eb72dd911f9e7ff506",
+        "title": "Lift Motorcycles",
+        "department": "Product Design",
+        "currentVersion": {
+            "usersRead": [
+            ],
+            "usersRequired": [
+            ],
+            "_id": "5b56a7eb72dd911f9e7ff507",
+            "version": 1,
+            "author": "Motor Man",
+            "createdAt": "2018-07-24T00:00:00.000Z",
+            "awsPath": "1532405738468-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+            "id": "5b56a7eb72dd911f9e7ff507",
+
+        },
+        "previousVersions": [],
+        "__v": 0,
+        "id": "5b56a7eb72dd911f9e7ff506"
+    }
+}
+```
+If an error occurs, returns errors object with status 500
+```
+{"errors": {"sops": "Unable to create SOP due to error"}
+```
+
+### GET /api/sops/allforuser
+Cookies Required: `access_token=token`\
+Returns All SOPs from the database to the user in this format:
+```
+[
+    {
+        "_id": "5b56a7eb72dd911f9e7ff506",
+        "title": "Lift Motorcycles",
+        "version": 1,
+        "awsPath": "1532405738468-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+        "department": "Product Design",
+        "author": "Motor Man",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": true
+    },
+    {
+        "_id": "5b56aae572dd911f9e7ff518",
+        "title": "New SOP",
+        "version": 1,
+        "awsPath": "1532406501220-1532396385150-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+        "department": "Vehicle Evaluation",
+        "author": "Mary Cooper",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": false
+    },
+    {
+        "_id": "5b56ab2072dd911f9e7ff51f",
+        "title": "New SOP",
+        "version": 1,
+        "awsPath": "1532406560019-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+        "department": "Regulations, Conversions & Accessories",
+        "author": "Mary Cooper",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": false
+    },
+    {
+        "_id": "5b56ab5772dd911f9e7ff527",
+        "title": "New SOPd",
+        "version": 1,
+        "awsPath": "1532406615065-1532396385150-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+        "department": "Regulations, Conversions & Accessories",
+        "author": "Sheldon Cooper",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": false
+    },
+    {
+        "_id": "5b56ab8a72dd911f9e7ff530",
+        "title": "adsf",
+        "version": 3,
+        "awsPath": "1532406665901-1532396385150-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+        "department": "Connected Vehicle Services",
+        "author": "Bill",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": false
+    },
+    {
+        "_id": "5b56abd172dd911f9e7ff53a",
+        "title": "Build Houses",
+        "version": 3,
+        "awsPath": "1532406736726-Handling-and-Logging-Errors-Recap.pdf",
+        "department": "Vehicle Evaluation",
+        "author": "Bill Renwick",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": true
+    },
+    {
+        "_id": "5b55eb793e04fb28a119ecbf",
+        "title": "Lift Cars",
+        "version": 3,
+        "awsPath": "1532414134535-file.pdf",
+        "department": "Regulations, Conversions & Accessories",
+        "author": "Sheldon Cooper",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": true
+    },
+    {
+        "_id": "5b52809c7474d61043a11569",
+        "title": "Lift Trucks",
+        "version": 9,
+        "awsPath": "1532329585928-Handling-and-Logging-Errors-Recap.pdf",
+        "department": "Regulations, Conversions & Accessories",
+        "author": "Sheldon Cooper",
+        "createdAt": "2018-07-23T00:00:00.000Z",
+        "read": true
+    },
+    {
+        "_id": "5b52645d34006c0b8115a4b3",
+        "title": "Barrr",
+        "version": 8,
+        "awsPath": "1532350130967-Mongoose-Modelling-Relationships-between-Connected-Data-Recap.pdf",
+        "department": "Product Design",
+        "author": "Bill Renwick",
+        "createdAt": "2018-07-23T00:00:00.000Z",
+        "read": true
+    }
+]
+```
+
+### PATCH /api/sops/addusers/:id
+Cookies Required: `access_token=token`
+Permissions required: `Admin: true`\
+Recieves an array of user `_id`s
 ```
 ```
 
-### GET /api/sops
+### PATCH /apisops/removeuser/:id
+Cookies Required: `access_token=token`
+Permissions required: `Admin: true`\
+`:id` corresponds to SOP `_id`
+Expects body to contain JSON of user `_id` no longer required to read SOP
+```
+{
+	"userId": "5b5410d47d093a520a2edbf6"
+}
+```
+On success returns status 200
+```
+{success: true, message: 'yay'}
+```
+
+### GET /api/sops/:id
+Cookies Required: `access_token=token`
+Permissions required: `Admin: true`\
+Returns JSON object containing following details about the SOP with `_id`
 ```
 ```
 
-### PATCH /api/sops
+### POST /api/sops/addversion/:id
+Cookies Required: `access_token=token`
+Permissions required: `Admin: true`\
+Expecting FormData with file, author, createdAt
+If success return status 200 with JSON object 
 ```
+{success: true, sop, users}
+```
+If error returns status 500 with errors object
+```
+{errors: {'sops': "Unable to add update SOP due to message"}}
 ```
 
-### DELETE /api/sops
+### PATCH api/sops/markasread/:id
+Cookies Required: `access_token=token`\
+`:id` is `_id` of SOP\
+Adds current users `_id` to SOP with `_id` 's `usersRead`\
+On success returns json with status 200
 ```
+{ success: true }
 ```
+
+#### GET /apisops/download/:key
+Cookies Required: `access_token=token`\
+`:key` corresponds to awspath
+Returns file to as an octet-stream
