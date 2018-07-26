@@ -24,7 +24,6 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
 app.use(helmet())
-app.use(express.static('build'))
 
 // Database Connection
 mongoose.connect(mongoURI)
