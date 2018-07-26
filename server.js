@@ -53,7 +53,7 @@ app.get('/api/auth', (req, res) => {
 
 app.use('/portal', express.static(path.join(__dirname, 'build')))
 
-app.get('/*', (req, res) => {
+app.get('/', (req, res) => {
   res.redirect('/portal')
 })
 
