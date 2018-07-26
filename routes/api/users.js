@@ -65,6 +65,7 @@ router.patch('/password', userAuth, adminAuth, async (req, res) => {
 })
 
 router.get('/logout', (req, res) => {
+  res.cookies.set('access_token', {expires: Date.now()})
   return res.clearCookie('access_token', {path: '/'}).send()
 })
 
@@ -113,7 +114,7 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({errors: 'Invalid Employee Number or Password'})
   }
   const token = user.generateAuthToken()
-  res.cookie('access_token', token, {})
+  res.cookie('access_token', token, {maxAge: Date.now()})
   return res.json({success: true, administrator: user.administrator})
 })
 
