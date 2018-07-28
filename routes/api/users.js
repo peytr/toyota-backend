@@ -14,10 +14,10 @@ const validateUpdateUserInput = require('../../validation/updateUser')
 const updateOldPassword = require('../../validation/updateOldPassword')
 const updateUserPassword = require('../../validation/updateUserPassword')
 
+// Auth Middleware
 const userAuth = require('../../middleware/userAuth')
 const adminAuth = require('../../middleware/adminAuth')
 
-// Constants
 const router = express.Router()
 
 // GET api/users - Returns all users from the User Collection
@@ -65,7 +65,8 @@ router.patch('/password', [userAuth, adminAuth], async (req, res) => {
 })
 
 router.get('/logout', (req, res) => {
-  return res.clearCookie('access_token').send()
+  res.cookie('access_token', 'loggedout', {maxAge: Date.now(), path: '/'})
+  return res.send()
 })
 
 // POST api/user/register receives json with user details
@@ -113,7 +114,7 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({errors: 'Invalid Employee Number or Password'})
   }
   const token = user.generateAuthToken()
-  res.cookie('access_token', token, {})
+  res.cookie('access_token', token, {maxAge: Date.now(), path: '/'})
   return res.json({success: true, administrator: user.administrator})
 })
 

@@ -314,14 +314,588 @@ Cookies Required: `access_token=token`
 1. GET /api/sops/mysops - Get logged in users SOPs
 2. POST /api/sops/
 3. GET /api/sops/:id
-4. PATCH /api/sops/:id
-5. DELETE /api/sops/:id
+5. PATCH /api/sops/addusers/:id
+6. PATCH /api/sops/removeuser/:id
+7. GET /api/sops/:id
+8. POST /api/sops/addversion/:id
+9. PATCH api/sops/markasread/:id
+10. GET /apisops/download/:key
 
 ### GET /api/sops
+Cookies Required: `access_token=token`\
+Permissions required: `Admin: true`\
+Sends all SOPs from the database to an ADMIN user in this format
 ```
+[
+    {
+        "_id": "5b56a7eb72dd911f9e7ff506",
+        "title": "Lift Motorcycles",
+        "department": "Product Design",
+        "currentVersion": {
+            "usersRead": [
+                "5b5410d47d093a520a2edbf6"
+            ],
+            "usersRequired": [
+                "5b5410d47d093a520a2edbf6"
+            ],
+            "_id": "5b56a7eb72dd911f9e7ff507",
+            "version": 1,
+            "author": "Motor Man",
+            "createdAt": "2018-07-24T00:00:00.000Z",
+            "awsPath": "1532405738468-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+            "id": "5b56a7eb72dd911f9e7ff507",
+            "currentExpires": "2023-07-24"
+        },
+        "previousVersions": [],
+        "__v": 0
+    },
+    {
+        "_id": "5b56aae572dd911f9e7ff518",
+        "title": "New SOP",
+        "department": "Vehicle Evaluation",
+        "currentVersion": {
+            "usersRead": [],
+            "usersRequired": [],
+            "_id": "5b56aae572dd911f9e7ff519",
+            "version": 1,
+            "author": "Mary Cooper",
+            "createdAt": "2018-07-24T00:00:00.000Z",
+            "awsPath": "1532406501220-1532396385150-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+            "id": "5b56aae572dd911f9e7ff519",
+            "currentExpires": "2023-07-24"
+        },
+        "previousVersions": [],
+        "__v": 0
+    },
+    {
+        "_id": "5b56ab2072dd911f9e7ff51f",
+        "title": "New SOP",
+        "department": "Regulations, Conversions & Accessories",
+        "currentVersion": {
+            "usersRead": [],
+            "usersRequired": [],
+            "_id": "5b56ab2072dd911f9e7ff520",
+            "version": 1,
+            "author": "Mary Cooper",
+            "createdAt": "2018-07-24T00:00:00.000Z",
+            "awsPath": "1532406560019-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+            "id": "5b56ab2072dd911f9e7ff520",
+            "currentExpires": "2023-07-24"
+        },
+        "previousVersions": [],
+        "__v": 0
+    },
+    {
+        "_id": "5b56ab5772dd911f9e7ff527",
+        "title": "New SOPd",
+        "department": "Regulations, Conversions & Accessories",
+        "currentVersion": {
+            "usersRead": [],
+            "usersRequired": [],
+            "_id": "5b56ab5772dd911f9e7ff528",
+            "version": 1,
+            "author": "Sheldon Cooper",
+            "createdAt": "2018-07-24T00:00:00.000Z",
+            "awsPath": "1532406615065-1532396385150-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+            "id": "5b56ab5772dd911f9e7ff528",
+            "currentExpires": "2023-07-24"
+        },
+        "previousVersions": [],
+        "__v": 0
+    },
+    {
+        "_id": "5b56ab8a72dd911f9e7ff530",
+        "title": "adsf",
+        "department": "Connected Vehicle Services",
+        "currentVersion": {
+            "usersRead": [],
+            "usersRequired": [],
+            "_id": "5b56ab8a72dd911f9e7ff531",
+            "version": 3,
+            "author": "Bill",
+            "createdAt": "2018-07-24T00:00:00.000Z",
+            "awsPath": "1532406665901-1532396385150-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+            "id": "5b56ab8a72dd911f9e7ff531",
+            "currentExpires": "2023-07-24"
+        },
+        "previousVersions": [],
+        "__v": 0
+    },
+    {
+        "_id": "5b56abd172dd911f9e7ff53a",
+        "title": "Build Houses",
+        "department": "Vehicle Evaluation",
+        "currentVersion": {
+            "usersRead": [],
+            "usersRequired": [
+                "5b5410d47d093a520a2edbf8",
+                "5b5410d47d093a520a2edc25"
+            ],
+            "_id": "5b56abd172dd911f9e7ff53b",
+            "version": 3,
+            "author": "Bill Renwick",
+            "createdAt": "2018-07-24T00:00:00.000Z",
+            "awsPath": "1532406736726-Handling-and-Logging-Errors-Recap.pdf",
+            "id": "5b56abd172dd911f9e7ff53b",
+            "currentExpires": "2023-07-24"
+        },
+        "previousVersions": [],
+        "__v": 0
+    },
+    {
+        "_id": "5b55eb793e04fb28a119ecbf",
+        "title": "Lift Cars",
+        "department": "Regulations, Conversions & Accessories",
+        "currentVersion": {
+            "usersRead": [],
+            "usersRequired": [
+                "5b5410d47d093a520a2edbf6",
+                "5b5410d47d093a520a2edbf9",
+                "5b5410d47d093a520a2edc12",
+                "5b5410d47d093a520a2edc06",
+                "5b5410d47d093a520a2edc28",
+                "5b5531ec6018b808e94df2d4",
+                "5b5410d47d093a520a2edc03",
+                "5b5410d47d093a520a2edc22",
+                "5b5410d47d093a520a2edc0c",
+                "5b5410d47d093a520a2edc00"
+            ],
+            "_id": "5b56c8b772dd911f9e7ff642",
+            "author": "Sheldon Cooper",
+            "createdAt": "2018-07-24T00:00:00.000Z",
+            "awsPath": "1532414134535-file.pdf",
+            "version": 3,
+            "id": "5b56c8b772dd911f9e7ff642",
+            "currentExpires": "2023-07-24"
+        },
+        "previousVersions": [
+            {
+                "usersRead": [
+                    "5b5410d47d093a520a2edbf6"
+                ],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edbf9",
+                    "5b5410d47d093a520a2edc12",
+                    "5b5410d47d093a520a2edc06",
+                    "5b5410d47d093a520a2edc28",
+                    "5b5531ec6018b808e94df2d4"
+                ],
+                "_id": "5b55eb793e04fb28a119ecc0",
+                "version": 1,
+                "author": "Bill Renwick",
+                "createdAt": "2018-07-17T00:00:00.000Z",
+                "awsPath": "1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+                "id": "5b55eb793e04fb28a119ecc0",
+                "currentExpires": "2023-07-17"
+            },
+            {
+                "usersRead": [
+                    "5b5410d47d093a520a2edbf6"
+                ],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edbf9",
+                    "5b5410d47d093a520a2edc12",
+                    "5b5410d47d093a520a2edc06",
+                    "5b5410d47d093a520a2edc28",
+                    "5b5531ec6018b808e94df2d4",
+                    "5b5410d47d093a520a2edc03",
+                    "5b5410d47d093a520a2edc22",
+                    "5b5410d47d093a520a2edc0c",
+                    "5b5410d47d093a520a2edc00"
+                ],
+                "_id": "5b568367ed7bb4112f7b7fe5",
+                "author": "Sheldon Cooper",
+                "createdAt": "2018-07-24T00:00:00.000Z",
+                "awsPath": "1532396385150-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+                "version": 2,
+                "id": "5b568367ed7bb4112f7b7fe5",
+                "currentExpires": "2023-07-24"
+            }
+        ],
+        "__v": 2
+    },
+    {
+        "_id": "5b52809c7474d61043a11569",
+        "title": "Lift Trucks",
+        "department": "Regulations, Conversions & Accessories",
+        "currentVersion": {
+            "usersRead": [
+                "5b5410d47d093a520a2edbf6"
+            ],
+            "usersRequired": [
+                "5b5410d47d093a520a2edbf6",
+                "5b5410d47d093a520a2edc13",
+                "5b5410d47d093a520a2edc1d",
+                "5b5410d47d093a520a2edc28",
+                "5b5410d47d093a520a2edbf8",
+                "5b5410d47d093a520a2edbf7",
+                "5b5410d47d093a520a2edbfc",
+                "5b5410d47d093a520a2edbfb",
+                "5b5410d47d093a520a2edc0f"
+            ],
+            "_id": "5b557e723e04fb28a119eb6c",
+            "author": "Sheldon Cooper",
+            "createdAt": "2018-07-23T00:00:00.000Z",
+            "awsPath": "1532329585928-Handling-and-Logging-Errors-Recap.pdf",
+            "version": 9,
+            "id": "5b557e723e04fb28a119eb6c",
+            "currentExpires": "2023-07-23"
+        },
+        "previousVersions": [
+            {
+                "usersRead": [
+                    "5b5410d47d093a520a2edbf6"
+                ],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc13",
+                    "5b5410d47d093a520a2edc1d",
+                    "5b5410d47d093a520a2edc28",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edbf7",
+                    "5b5410d47d093a520a2edbfc",
+                    "5b5410d47d093a520a2edbfb",
+                    "5b5410d47d093a520a2edc0f"
+                ],
+                "_id": "5b52809c7474d61043a1156a",
+                "version": 3,
+                "author": "Tom",
+                "createdAt": "2018-07-21T00:00:00.000Z",
+                "awsPath": "1532133531640-1532125030444-atlassian-git-cheatsheet.pdf",
+                "id": "5b52809c7474d61043a1156a",
+                "currentExpires": "2023-07-21"
+            },
+            {
+                "usersRead": [],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc13",
+                    "5b5410d47d093a520a2edc1d",
+                    "5b5410d47d093a520a2edc28",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edbf7",
+                    "5b5410d47d093a520a2edbfc",
+                    "5b5410d47d093a520a2edbfb",
+                    "5b5410d47d093a520a2edc0f"
+                ],
+                "_id": "5b5559c9d3c56119a9d4ae28",
+                "author": "Mary Cooper",
+                "createdAt": "2018-07-23T00:00:00.000Z",
+                "awsPath": "1532320200881-Term 3 Assignment_ Part B and Part C.pdf",
+                "version": 4,
+                "id": "5b5559c9d3c56119a9d4ae28",
+                "currentExpires": "2023-07-23"
+            },
+            {
+                "usersRead": [],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc13",
+                    "5b5410d47d093a520a2edc1d",
+                    "5b5410d47d093a520a2edc28",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edbf7",
+                    "5b5410d47d093a520a2edbfc",
+                    "5b5410d47d093a520a2edbfb",
+                    "5b5410d47d093a520a2edc0f"
+                ],
+                "_id": "5b55776803ec771a2c50cc0f",
+                "author": "Sheldon Cooper",
+                "createdAt": "2018-07-16T00:00:00.000Z",
+                "awsPath": "1532327782977-Handling-and-Logging-Errors-Recap.pdf",
+                "version": 5,
+                "id": "5b55776803ec771a2c50cc0f",
+                "currentExpires": "2023-07-16"
+            },
+            {
+                "usersRead": [],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc13",
+                    "5b5410d47d093a520a2edc1d",
+                    "5b5410d47d093a520a2edc28",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edbf7",
+                    "5b5410d47d093a520a2edbfc",
+                    "5b5410d47d093a520a2edbfb",
+                    "5b5410d47d093a520a2edc0f"
+                ],
+                "_id": "5b55776f03ec771a2c50cc12",
+                "author": "Sheldon Cooper",
+                "createdAt": "2018-07-16T00:00:00.000Z",
+                "awsPath": "1532327791024-Handling-and-Logging-Errors-Recap.pdf",
+                "version": 6,
+                "id": "5b55776f03ec771a2c50cc12",
+                "currentExpires": "2023-07-16"
+            },
+            {
+                "usersRead": [],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc13",
+                    "5b5410d47d093a520a2edc1d",
+                    "5b5410d47d093a520a2edc28",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edbf7",
+                    "5b5410d47d093a520a2edbfc",
+                    "5b5410d47d093a520a2edbfb",
+                    "5b5410d47d093a520a2edc0f"
+                ],
+                "_id": "5b557c153e04fb28a119eb62",
+                "author": "Mary Cooper",
+                "createdAt": "2018-07-23T00:00:00.000Z",
+                "awsPath": "1532328980089-1532133531640-1532125030444-atlassian-git-cheatsheet.pdf",
+                "version": 7,
+                "id": "5b557c153e04fb28a119eb62",
+                "currentExpires": "2023-07-23"
+            },
+            {
+                "usersRead": [],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc13",
+                    "5b5410d47d093a520a2edc1d",
+                    "5b5410d47d093a520a2edc28",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edbf7",
+                    "5b5410d47d093a520a2edbfc",
+                    "5b5410d47d093a520a2edbfb",
+                    "5b5410d47d093a520a2edc0f"
+                ],
+                "_id": "5b557e323e04fb28a119eb68",
+                "author": "Mary Cooper",
+                "createdAt": "2018-07-16T00:00:00.000Z",
+                "awsPath": "1532329521551-nat12.jpg",
+                "version": 8,
+                "id": "5b557e323e04fb28a119eb68",
+                "currentExpires": "2023-07-16"
+            }
+        ],
+        "__v": 6
+    },
+    {
+        "_id": "5b52645d34006c0b8115a4b3",
+        "title": "Barrr",
+        "department": "Product Design",
+        "currentVersion": {
+            "usersRead": [
+                "5b5410d47d093a520a2edbf6"
+            ],
+            "usersRequired": [
+                "5b5410d47d093a520a2edbf6",
+                "5b5410d47d093a520a2edc1a",
+                "5b5410d47d093a520a2edbf8",
+                "5b5410d47d093a520a2edc03",
+                "5b5410d47d093a520a2edbfd",
+                "5b5410d47d093a520a2edc01",
+                "5b5410d47d093a520a2edbff",
+                "5b5410d47d093a520a2edc21",
+                "5b5410d47d093a520a2edc19",
+                "5b5410d47d093a520a2edc24",
+                "5b5410d47d093a520a2edbf9",
+                "5b5410d47d093a520a2edc17",
+                "5b5410d47d093a520a2edc20"
+            ],
+            "_id": "5b55ceb33e04fb28a119ec5f",
+            "author": "Bill Renwick",
+            "createdAt": "2018-07-23T00:00:00.000Z",
+            "awsPath": "1532350130967-Mongoose-Modelling-Relationships-between-Connected-Data-Recap.pdf",
+            "version": 8,
+            "id": "5b55ceb33e04fb28a119ec5f",
+            "currentExpires": "2023-07-23"
+        },
+        "previousVersions": [
+            {
+                "usersRead": [
+                    "5b5410d47d093a520a2edbf6"
+                ],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc1a",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edc03",
+                    "5b5410d47d093a520a2edbfd",
+                    "5b5410d47d093a520a2edc01",
+                    "5b5410d47d093a520a2edbff",
+                    "5b5410d47d093a520a2edc21",
+                    "5b5410d47d093a520a2edc19",
+                    "5b5410d47d093a520a2edc24",
+                    "5b5410d47d093a520a2edbf9",
+                    "5b5410d47d093a520a2edc17",
+                    "5b5410d47d093a520a2edc20"
+                ],
+                "_id": "5b52645d34006c0b8115a4b4",
+                "version": 1,
+                "author": "Tom",
+                "createdAt": "2018-07-17T00:00:00.000Z",
+                "awsPath": "1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+                "id": "5b52645d34006c0b8115a4b4",
+                "currentExpires": "2023-07-17"
+            },
+            {
+                "usersRead": [],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc1a",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edc03",
+                    "5b5410d47d093a520a2edbfd",
+                    "5b5410d47d093a520a2edc01",
+                    "5b5410d47d093a520a2edbff",
+                    "5b5410d47d093a520a2edc21",
+                    "5b5410d47d093a520a2edc19",
+                    "5b5410d47d093a520a2edc24",
+                    "5b5410d47d093a520a2edbf9",
+                    "5b5410d47d093a520a2edc17",
+                    "5b5410d47d093a520a2edc20"
+                ],
+                "_id": "5b55c2133e04fb28a119ec2b",
+                "author": "Bill Renwick",
+                "createdAt": "2018-07-24T00:00:00.000Z",
+                "awsPath": "1532346898752-Mongoose-Modelling-Relationships-between-Connected-Data-Recap.pdf",
+                "version": 2,
+                "id": "5b55c2133e04fb28a119ec2b",
+                "currentExpires": "2023-07-24"
+            },
+            {
+                "usersRead": [],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc1a",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edc03",
+                    "5b5410d47d093a520a2edbfd",
+                    "5b5410d47d093a520a2edc01",
+                    "5b5410d47d093a520a2edbff",
+                    "5b5410d47d093a520a2edc21",
+                    "5b5410d47d093a520a2edc19",
+                    "5b5410d47d093a520a2edc24",
+                    "5b5410d47d093a520a2edbf9",
+                    "5b5410d47d093a520a2edc17",
+                    "5b5410d47d093a520a2edc20"
+                ],
+                "_id": "5b55cb2f3e04fb28a119ec50",
+                "author": "Tom Jones",
+                "createdAt": "2018-07-23T00:00:00.000Z",
+                "awsPath": "1532349230488-Authentication-and-Authorization-Recap.pdf",
+                "version": 3,
+                "id": "5b55cb2f3e04fb28a119ec50",
+                "currentExpires": "2023-07-23"
+            },
+            {
+                "usersRead": [],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc1a",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edc03",
+                    "5b5410d47d093a520a2edbfd",
+                    "5b5410d47d093a520a2edc01",
+                    "5b5410d47d093a520a2edbff",
+                    "5b5410d47d093a520a2edc21",
+                    "5b5410d47d093a520a2edc19",
+                    "5b5410d47d093a520a2edc24",
+                    "5b5410d47d093a520a2edbf9",
+                    "5b5410d47d093a520a2edc17",
+                    "5b5410d47d093a520a2edc20"
+                ],
+                "_id": "5b55cc273e04fb28a119ec53",
+                "author": "Mary Cooper",
+                "createdAt": "2018-07-23T00:00:00.000Z",
+                "awsPath": "1532349479300-1532346898752-Mongoose-Modelling-Relationships-between-Connected-Data-Recap.pdf",
+                "version": 4,
+                "id": "5b55cc273e04fb28a119ec53",
+                "currentExpires": "2023-07-23"
+            },
+            {
+                "usersRead": [],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc1a",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edc03",
+                    "5b5410d47d093a520a2edbfd",
+                    "5b5410d47d093a520a2edc01",
+                    "5b5410d47d093a520a2edbff",
+                    "5b5410d47d093a520a2edc21",
+                    "5b5410d47d093a520a2edc19",
+                    "5b5410d47d093a520a2edc24",
+                    "5b5410d47d093a520a2edbf9",
+                    "5b5410d47d093a520a2edc17",
+                    "5b5410d47d093a520a2edc20"
+                ],
+                "_id": "5b55cd1e3e04fb28a119ec56",
+                "author": "Tom",
+                "createdAt": "2018-07-23T00:00:00.000Z",
+                "awsPath": "1532349726276-nat12.jpg",
+                "version": 5,
+                "id": "5b55cd1e3e04fb28a119ec56",
+                "currentExpires": "2023-07-23"
+            },
+            {
+                "usersRead": [],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc1a",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edc03",
+                    "5b5410d47d093a520a2edbfd",
+                    "5b5410d47d093a520a2edc01",
+                    "5b5410d47d093a520a2edbff",
+                    "5b5410d47d093a520a2edc21",
+                    "5b5410d47d093a520a2edc19",
+                    "5b5410d47d093a520a2edc24",
+                    "5b5410d47d093a520a2edbf9",
+                    "5b5410d47d093a520a2edc17",
+                    "5b5410d47d093a520a2edc20"
+                ],
+                "_id": "5b55cd7e3e04fb28a119ec59",
+                "author": "Sheldon Cooper",
+                "createdAt": "2018-07-23T00:00:00.000Z",
+                "awsPath": "1532349822253-Mongoose-Modelling-Relationships-between-Connected-Data-Recap.pdf",
+                "version": 6,
+                "id": "5b55cd7e3e04fb28a119ec59",
+                "currentExpires": "2023-07-23"
+            },
+            {
+                "usersRead": [],
+                "usersRequired": [
+                    "5b5410d47d093a520a2edbf6",
+                    "5b5410d47d093a520a2edc1a",
+                    "5b5410d47d093a520a2edbf8",
+                    "5b5410d47d093a520a2edc03",
+                    "5b5410d47d093a520a2edbfd",
+                    "5b5410d47d093a520a2edc01",
+                    "5b5410d47d093a520a2edbff",
+                    "5b5410d47d093a520a2edc21",
+                    "5b5410d47d093a520a2edc19",
+                    "5b5410d47d093a520a2edc24",
+                    "5b5410d47d093a520a2edbf9",
+                    "5b5410d47d093a520a2edc17",
+                    "5b5410d47d093a520a2edc20"
+                ],
+                "_id": "5b55ce4d3e04fb28a119ec5c",
+                "author": "Bill Renwick",
+                "createdAt": "2018-07-23T00:00:00.000Z",
+                "awsPath": "1532350029203-Authentication-and-Authorization-Recap.pdf",
+                "version": 7,
+                "id": "5b55ce4d3e04fb28a119ec5c",
+                "currentExpires": "2023-07-23"
+            }
+        ],
+        "__v": 7
+    }
+]
 ```
 
-### GET /api/mysops
+If database query fails returns status 500
+```
+{errors: {'sops': 'Unable to find sops'}}
+```
+
+### GET /api/sops/mysops
 ```
 {
     "readSops": [
@@ -347,18 +921,192 @@ Cookies Required: `access_token=token`
     "outdatedSops": []
 }
 ```
+
 ### POST /api/sops
+Recieves a FormData from admin user with version, author, createdAt, file
+Cookies Required: `access_token=token`\
+Permissions required: `Admin: true`\
+On successful creation, JSON object with SOP details return
+```
+{
+    "sop": {
+        "_id": "5b56a7eb72dd911f9e7ff506",
+        "title": "Lift Motorcycles",
+        "department": "Product Design",
+        "currentVersion": {
+            "usersRead": [
+            ],
+            "usersRequired": [
+            ],
+            "_id": "5b56a7eb72dd911f9e7ff507",
+            "version": 1,
+            "author": "Motor Man",
+            "createdAt": "2018-07-24T00:00:00.000Z",
+            "awsPath": "1532405738468-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+            "id": "5b56a7eb72dd911f9e7ff507",
+
+        },
+        "previousVersions": [],
+        "__v": 0,
+        "id": "5b56a7eb72dd911f9e7ff506"
+    }
+}
+```
+If an error occurs, returns errors object with status 500
+```
+{"errors": {"sops": "Unable to create SOP due to error"}
+```
+
+### GET /api/sops/allforuser
+Cookies Required: `access_token=token`\
+Returns All SOPs from the database to the user in this format:
+```
+[
+    {
+        "_id": "5b56a7eb72dd911f9e7ff506",
+        "title": "Lift Motorcycles",
+        "version": 1,
+        "awsPath": "1532405738468-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+        "department": "Product Design",
+        "author": "Motor Man",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": true
+    },
+    {
+        "_id": "5b56aae572dd911f9e7ff518",
+        "title": "New SOP",
+        "version": 1,
+        "awsPath": "1532406501220-1532396385150-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+        "department": "Vehicle Evaluation",
+        "author": "Mary Cooper",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": false
+    },
+    {
+        "_id": "5b56ab2072dd911f9e7ff51f",
+        "title": "New SOP",
+        "version": 1,
+        "awsPath": "1532406560019-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+        "department": "Regulations, Conversions & Accessories",
+        "author": "Mary Cooper",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": false
+    },
+    {
+        "_id": "5b56ab5772dd911f9e7ff527",
+        "title": "New SOPd",
+        "version": 1,
+        "awsPath": "1532406615065-1532396385150-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+        "department": "Regulations, Conversions & Accessories",
+        "author": "Sheldon Cooper",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": false
+    },
+    {
+        "_id": "5b56ab8a72dd911f9e7ff530",
+        "title": "adsf",
+        "version": 3,
+        "awsPath": "1532406665901-1532396385150-1532357497180-1532126300565-1532125030444-atlassian-git-cheatsheet.pdf",
+        "department": "Connected Vehicle Services",
+        "author": "Bill",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": false
+    },
+    {
+        "_id": "5b56abd172dd911f9e7ff53a",
+        "title": "Build Houses",
+        "version": 3,
+        "awsPath": "1532406736726-Handling-and-Logging-Errors-Recap.pdf",
+        "department": "Vehicle Evaluation",
+        "author": "Bill Renwick",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": true
+    },
+    {
+        "_id": "5b55eb793e04fb28a119ecbf",
+        "title": "Lift Cars",
+        "version": 3,
+        "awsPath": "1532414134535-file.pdf",
+        "department": "Regulations, Conversions & Accessories",
+        "author": "Sheldon Cooper",
+        "createdAt": "2018-07-24T00:00:00.000Z",
+        "read": true
+    },
+    {
+        "_id": "5b52809c7474d61043a11569",
+        "title": "Lift Trucks",
+        "version": 9,
+        "awsPath": "1532329585928-Handling-and-Logging-Errors-Recap.pdf",
+        "department": "Regulations, Conversions & Accessories",
+        "author": "Sheldon Cooper",
+        "createdAt": "2018-07-23T00:00:00.000Z",
+        "read": true
+    },
+    {
+        "_id": "5b52645d34006c0b8115a4b3",
+        "title": "Barrr",
+        "version": 8,
+        "awsPath": "1532350130967-Mongoose-Modelling-Relationships-between-Connected-Data-Recap.pdf",
+        "department": "Product Design",
+        "author": "Bill Renwick",
+        "createdAt": "2018-07-23T00:00:00.000Z",
+        "read": true
+    }
+]
+```
+
+### PATCH /api/sops/addusers/:id
+Cookies Required: `access_token=token`
+Permissions required: `Admin: true`\
+Recieves an array of user `_id`s
 ```
 ```
 
-### GET /api/sops
+### PATCH /apisops/removeuser/:id
+Cookies Required: `access_token=token`
+Permissions required: `Admin: true`\
+`:id` corresponds to SOP `_id`
+Expects body to contain JSON of user `_id` no longer required to read SOP
+```
+{
+	"userId": "5b5410d47d093a520a2edbf6"
+}
+```
+On success returns status 200
+```
+{success: true, message: 'yay'}
+```
+
+### GET /api/sops/:id
+Cookies Required: `access_token=token`
+Permissions required: `Admin: true`\
+Returns JSON object containing following details about the SOP with `_id`
 ```
 ```
 
-### PATCH /api/sops
+### POST /api/sops/addversion/:id
+Cookies Required: `access_token=token`
+Permissions required: `Admin: true`\
+Expecting FormData with file, author, createdAt
+If success return status 200 with JSON object 
 ```
+{success: true, sop, users}
+```
+If error returns status 500 with errors object
+```
+{errors: {'sops': "Unable to add update SOP due to message"}}
 ```
 
-### DELETE /api/sops
+### PATCH api/sops/markasread/:id
+Cookies Required: `access_token=token`\
+`:id` is `_id` of SOP\
+Adds current users `_id` to SOP with `_id` 's `usersRead`\
+On success returns json with status 200
 ```
+{ success: true }
 ```
+
+#### GET /apisops/download/:key
+Cookies Required: `access_token=token`\
+`:key` corresponds to awspath
+Returns file to as an octet-stream
