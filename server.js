@@ -4,7 +4,6 @@ const mongoose = require('mongoose')
 const helmet = require('helmet')
 const cookieParser = require('cookie-parser')
 const jwt = require('jsonwebtoken')
-const path = require('path')
 require('dotenv').config()
 
 // Require in Routes
@@ -24,6 +23,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
 app.use(helmet())
+app.use(express.static('build'))
 
 // Database Connection
 mongoose.connect(mongoURI)
@@ -51,7 +51,9 @@ app.get('/api/auth', (req, res) => {
   }
 })
 
-app.use('/', express.static(path.join(__dirname, 'build')))
+app.get('*', function (req, res) {
+  return res.sendfile('./build/index.html')
+})
 
 app.use(error)
 
