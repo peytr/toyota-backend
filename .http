@@ -1,5 +1,13 @@
 ###
-POST http://localhost:5050/api/users/register
+POST http://localhost:5000/api/users/login
+content-type: application/json
+
+{
+    "employeeNumber": "T11111",
+    "password": "password123"
+}
+###
+POST http://localhost:5000/api/users/register
 content-type: application/json
 
 {
@@ -13,12 +21,18 @@ content-type: application/json
     "administrator": true,
     "active": true
 }
-
 ###
-POST http://localhost:5000/api/users/login
+POST http://localhost:5000/api/users/register
 content-type: application/json
 
 {
-    "employeeNumber": "T12345",
-    "password": "password123"
+    "firstName": "Luke",
+    "lastName": "Lolcott",
+    "employeeNumber": "T11111",
+    "email": "l.lolcott@live.com",
+    "department": "Research and Design",
+    "password": "password123",
+    "password2": "password123",
+    "administrator": true,
+    "active": true
 }

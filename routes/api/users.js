@@ -41,7 +41,7 @@ router.get('/me', userAuth, async (req, res) => {
 })
 
 //  PATCH /api/users/:id
-router.patch('/password', userAuth, adminAuth, async (req, res) => {
+router.patch('/password', [userAuth, adminAuth], async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
     if (!user) {
@@ -152,7 +152,7 @@ router.patch('/:id', [userAuth, adminAuth], async (req, res) => {
     }
     const { errors, isValid } = validateUpdateUserInput(req.body)
     if (!isValid) {
-      return res.status(400).json({errors})
+      return res.status(200).json({errors})
     }
     user.set({
       firstName: req.body.firstName,
