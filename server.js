@@ -5,6 +5,8 @@ const helmet = require('helmet')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
+const path = require('path')
+
 require('dotenv').config()
 
 // Require in Routes
@@ -55,6 +57,8 @@ app.get('/api/auth', (req, res) => {
     return res.status(200).json({login: false, administrator: false})
   }
 })
+
+app.use('/', express.static(path.join(__dirname, 'build')))
 
 app.use(error)
 
