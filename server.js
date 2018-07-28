@@ -4,6 +4,8 @@ const mongoose = require('mongoose')
 const helmet = require('helmet')
 const cookieParser = require('cookie-parser')
 const jwt = require('jsonwebtoken')
+const nocache = require('nocache')
+
 require('dotenv').config()
 
 // Require in Routes
@@ -23,6 +25,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({extended: false}))
 app.use(helmet())
+app.use(nocache())
 app.use(express.static('build'))
 
 // Database Connection
